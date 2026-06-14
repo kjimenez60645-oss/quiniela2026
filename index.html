@@ -119,7 +119,7 @@ const JORNADAS = [
     { id:"j1g04", home:"USA", away:"Paraguay", group:"D", result:"L" },
     { id:"j1g05", home:"Qatar", away:"Switzerland", group:"B", result:"E" },
     { id:"j1g06", home:"Brazil", away:"Morocco", group:"C", result:"E" },
-    { id:"j1g07", home:"Haiti", away:"Scotland", group:"C", result:null },
+    { id:"j1g07", home:"Haiti", away:"Scotland", group:"C", result:"V" },
     { id:"j1g08", home:"Australia", away:"Türkiye", group:"D", result:null },
     { id:"j1g09", home:"Germany", away:"Curacao", group:"E", result:null },
     { id:"j1g10", home:"Netherlands", away:"Japan", group:"F", result:null },
@@ -195,38 +195,61 @@ const JORNADAS = [
 const ALL_GAMES = JORNADAS.flatMap(j => j.games.map(g => ({ ...g, jornada: j.label })));
 
 // --------------------------------------------------------------
-// PREDICCIONES REALES (solo para partidos de Jornada 1, match 1 a 6)
-// El resto de partidos NO tienen pronóstico (undefined) → no puntúan hasta que se agreguen.
+// PREDICCIONES REALES (Jornada 1, matches 1 a 12)
+// Los partidos 13 a 24 de J1, y toda J2/J3 no tienen pronóstico.
 // --------------------------------------------------------------
 const PREDICTIONS_DATA = {
-  // Match 1: Mexico vs South Africa (j1g01)
+  // Match 1: Mexico vs South Africa
   j1g01: {
     Cristina:"L", Consuelo:"E", Noe:"V", Jessica:"E", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L"
   },
-  // Match 2: Korea Republic vs Czechia (j1g02)  Base L, exceptions: E and V
+  // Match 2: Korea Republic vs Czechia
   j1g02: {
     Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"E", David:"V", Diana:"V", Julio:"E", Luis:"L", "Jose D":"E", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"E", Miros:"L", Nacho:"E", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"L", "Miguel R":"E", Maria:"L", Miguelito:"E", Bryan:"L"
   },
-  // Match 3: Canada vs Bosnia (j1g03)
+  // Match 3: Canada vs Bosnia
   j1g03: {
     Cristina:"V", Consuelo:"L", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"E", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"V", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"V", Miguelito:"L", Bryan:"L"
   },
-  // Match 4: USA vs Paraguay (j1g04)
+  // Match 4: USA vs Paraguay
   j1g04: {
     Cristina:"L", Consuelo:"E", Noe:"E", Jessica:"V", David:"E", Diana:"V", Julio:"L", Luis:"V", "Jose D":"E", Patron:"E", "Julio Jr":"L", Andres:"V", Jorge:"V", Papa:"L", KJ:"L", Yuny:"L", Miros:"V", Nacho:"V", Tony:"E", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"E", Maria:"L", Miguelito:"V", Bryan:"L"
   },
-  // Match 5: Qatar vs Switzerland (j1g05)
+  // Match 5: Qatar vs Switzerland
   j1g05: {
     Cristina:"L", Consuelo:"L", Noe:"E", Jessica:"V", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"L", Papa:"V", KJ:"V", Yuny:"V", Miros:"L", Nacho:"V", Tony:"V", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"E", Maria:"L", Miguelito:"E", Bryan:"V"
   },
-  // Match 6: Brazil vs Morocco (j1g06)
+  // Match 6: Brazil vs Morocco
   j1g06: {
     Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L"
+  },
+  // Match 7: Haiti vs Scotland
+  j1g07: {
+    Cristina:"L", Consuelo:"V", Noe:"E", Jessica:"E", David:"V", Diana:"E", Julio:"E", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"L", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"V", Speedy:"E", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", Maria:"V", Miguelito:"E", Bryan:"V"
+  },
+  // Match 8: Australia vs Türkiye
+  j1g08: {
+    Cristina:"V", Consuelo:"L", Noe:"E", Jessica:"V", David:"E", Diana:"V", Julio:"L", Luis:"L", "Jose D":"E", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"L", KJ:"E", Yuny:"E", Miros:"V", Nacho:"E", Tony:"L", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"E"
+  },
+  // Match 9: Germany vs Curacao
+  j1g09: {
+    Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"E", David:"L", Diana:"L", Julio:"E", Luis:"L", "Jose D":"L", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L"
+  },
+  // Match 10: Netherlands vs Japan
+  j1g10: {
+    Cristina:"V", Consuelo:"L", Noe:"L", Jessica:"V", David:"V", Diana:"L", Julio:"V", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"E", Papa:"V", KJ:"L", Yuny:"L", Miros:"E", Nacho:"E", Tony:"L", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", Maria:"E", Miguelito:"V", Bryan:"L"
+  },
+  // Match 11: Ivory Coast vs Ecuador
+  j1g11: {
+    Cristina:"V", Consuelo:"V", Noe:"L", Jessica:"E", David:"E", Diana:"V", Julio:"L", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"E", Miros:"V", Nacho:"V", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"E", Maria:"V", Miguelito:"E", Bryan:"L"
+  },
+  // Match 12: Sweden vs Tunisia
+  j1g12: {
+    Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"E"
   }
-  // Los partidos del 7 al 24 de Jornada 1, y toda Jornada 2 y 3 no tienen pronósticos (undefined)
+  // Los partidos 13 al 24 de Jornada 1, y todas las jornadas 2 y 3 quedan sin pronóstico.
 };
 
-// Lista completa de participantes (nombres exactos como en predicciones)
 const PARTICIPANT_NAMES = [
   "Cristina","Consuelo","Noe","Jessica","David","Diana","Julio","Luis","Jose D","Patron","Julio Jr","Andres","Jorge","Papa","KJ","Yuny","Miros","Nacho","Tony","Speedy","Carlos G","Miguel C","Miguel R","Maria","Miguelito","Bryan"
 ];
@@ -234,10 +257,9 @@ const PARTICIPANT_COLORS = {
   Cristina:"#ec4899", Consuelo:"#f97316", Noe:"#3b82f6", Jessica:"#a855f7", David:"#10b981", Diana:"#f43f5e", Julio:"#eab308", Luis:"#06b6d4", "Jose D":"#8b5cf6", Patron:"#84cc16", "Julio Jr":"#fb923c", Andres:"#14b8a6", Jorge:"#ef4444", Papa:"#f59e0b", KJ:"#6366f1", Yuny:"#d946ef", Miros:"#0ea5e9", Nacho:"#f472b6", Tony:"#22d3ee", Speedy:"#a3e635", "Carlos G":"#34d399", "Miguel C":"#fb7185", "Miguel R":"#818cf8", Maria:"#f0abfc", Miguelito:"#c084fc", Bryan:"#38bdf8"
 };
 
-// Construir array de participantes con sus predicciones (solo las que existen)
+// Construir participantes con sus predicciones (solo las que existen)
 const PARTICIPANTS = PARTICIPANT_NAMES.map(name => {
   const predictions = {};
-  // Solo agregar predicción si existe en PREDICTIONS_DATA para ese gameId y ese participante
   for (const [gameId, picks] of Object.entries(PREDICTIONS_DATA)) {
     if (picks[name] !== undefined) {
       predictions[gameId] = picks[name];
@@ -246,15 +268,12 @@ const PARTICIPANTS = PARTICIPANT_NAMES.map(name => {
   return { name, color: PARTICIPANT_COLORS[name], predictions };
 });
 
-// --------------------------------------------------------------
-// Cálculo de puntos (solo partidos con resultado Y pronóstico)
-// --------------------------------------------------------------
 function calcPoints(participant) {
   let pts = 0, correct = 0, wrong = 0, pending = 0;
   ALL_GAMES.forEach(g => {
     const pick = participant.predictions[g.id];
-    if (!pick) { pending++; return; }          // sin pronóstico
-    if (g.result === null) { pending++; return; } // resultado pendiente
+    if (!pick) { pending++; return; }
+    if (g.result === null) { pending++; return; }
     if (pick === g.result) { pts++; correct++; }
     else { wrong++; }
   });
@@ -353,7 +372,6 @@ function openFullPodium() {
 }
 function closeFull() { document.getElementById("fullPodiumModal").classList.remove("open"); }
 
-// Event listeners
 document.getElementById("podiumToggleBtn").addEventListener("click",()=>{
   const body = document.getElementById("podiumBody");
   const chevron = document.getElementById("podiumChevron");
