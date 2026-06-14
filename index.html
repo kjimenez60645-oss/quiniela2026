@@ -88,7 +88,7 @@
 </head>
 <body>
 <div class="app">
-  <div class="header"><span class="ball-icon">⚽</span><h1>Quiniela 2026</h1><p>FIFA World Cup · Fase de Grupos · $20</p></div>
+  <div class="header"><span class="ball-icon">⚽</span><h1>Quiniela 2026</h1><p>Copa del Mundo · Fase de Grupos · $20</p></div>
   <div class="search-wrap"><i class="ti ti-search si"></i><input type="text" id="searchInput" placeholder="Buscar participante..." autocomplete="off"></div>
   <div class="filter-row"><button class="filter-btn active" data-filter="all">Todos</button><button class="filter-btn" data-filter="top10">Top 10</button></div>
   <div class="section-title">🏆 Podio</div>
@@ -109,145 +109,116 @@
 <script>
 // --------------------------------------------------------------
 // MUNDIAL 2026 – FASE DE GRUPOS (72 partidos, 12 grupos)
-// Calendario oficial y resultados conocidos (actualizados al 13/jun)
+// Nombres en español con banderas, resultados conocidos actualizados
 // --------------------------------------------------------------
 const JORNADAS = [
   { label: "Jornada 1 · 11–17 Jun", games: [
-    { id:"j1g01", home:"México", away:"South Africa", group:"A", result:"L" },
-    { id:"j1g02", home:"Korea Republic", away:"Czechia", group:"A", result:"L" },
-    { id:"j1g03", home:"Canada", away:"Bosnia and Herzegovina", group:"B", result:"E" },
-    { id:"j1g04", home:"USA", away:"Paraguay", group:"D", result:"L" },
-    { id:"j1g05", home:"Qatar", away:"Switzerland", group:"B", result:"E" },
-    { id:"j1g06", home:"Brazil", away:"Morocco", group:"C", result:"E" },
-    { id:"j1g07", home:"Haiti", away:"Scotland", group:"C", result:"V" },
-    { id:"j1g08", home:"Australia", away:"Türkiye", group:"D", result:null },
-    { id:"j1g09", home:"Germany", away:"Curacao", group:"E", result:null },
-    { id:"j1g10", home:"Netherlands", away:"Japan", group:"F", result:null },
-    { id:"j1g11", home:"Ivory Coast", away:"Ecuador", group:"E", result:null },
-    { id:"j1g12", home:"Sweden", away:"Tunisia", group:"F", result:null },
-    { id:"j1g13", home:"Spain", away:"Cape Verde", group:"H", result:null },
-    { id:"j1g14", home:"Belgium", away:"Egypt", group:"G", result:null },
-    { id:"j1g15", home:"Saudi Arabia", away:"Uruguay", group:"H", result:null },
-    { id:"j1g16", home:"IR Iran", away:"New Zealand", group:"G", result:null },
-    { id:"j1g17", home:"France", away:"Senegal", group:"I", result:null },
-    { id:"j1g18", home:"Iraq", away:"Norway", group:"I", result:null },
-    { id:"j1g19", home:"Argentina", away:"Algeria", group:"J", result:null },
-    { id:"j1g20", home:"Austria", away:"Jordan", group:"J", result:null },
-    { id:"j1g21", home:"Portugal", away:"Congo DR", group:"K", result:null },
-    { id:"j1g22", home:"England", away:"Croatia", group:"L", result:null },
-    { id:"j1g23", home:"Ghana", away:"Panama", group:"L", result:null },
-    { id:"j1g24", home:"Uzbekistan", away:"Colombia", group:"K", result:null }
+    { id:"j1g01", home:"México 🇲🇽", away:"Sudáfrica 🇿🇦", group:"A", result:"L" },
+    { id:"j1g02", home:"Corea del Sur 🇰🇷", away:"Chequia 🇨🇿", group:"A", result:"L" },
+    { id:"j1g03", home:"Canadá 🇨🇦", away:"Bosnia y Herzegovina 🇧🇦", group:"B", result:"E" },
+    { id:"j1g04", home:"EE.UU. 🇺🇸", away:"Paraguay 🇵🇾", group:"D", result:"L" },
+    { id:"j1g05", home:"Catar 🇶🇦", away:"Suiza 🇨🇭", group:"B", result:"E" },
+    { id:"j1g06", home:"Brasil 🇧🇷", away:"Marruecos 🇲🇦", group:"C", result:"E" },
+    { id:"j1g07", home:"Haití 🇭🇹", away:"Escocia 🏴󠁧󠁢󠁳󠁣󠁴󠁿", group:"C", result:"V" },
+    { id:"j1g08", home:"Australia 🇦🇺", away:"Turquía 🇹🇷", group:"D", result:"L" },
+    { id:"j1g09", home:"Alemania 🇩🇪", away:"Curazao 🇨🇼", group:"E", result:null },
+    { id:"j1g10", home:"Países Bajos 🇳🇱", away:"Japón 🇯🇵", group:"F", result:null },
+    { id:"j1g11", home:"Costa de Marfil 🇨🇮", away:"Ecuador 🇪🇨", group:"E", result:null },
+    { id:"j1g12", home:"Suecia 🇸🇪", away:"Túnez 🇹🇳", group:"F", result:null },
+    { id:"j1g13", home:"España 🇪🇸", away:"Cabo Verde 🇨🇻", group:"H", result:null },
+    { id:"j1g14", home:"Bélgica 🇧🇪", away:"Egipto 🇪🇬", group:"G", result:null },
+    { id:"j1g15", home:"Arabia Saudita 🇸🇦", away:"Uruguay 🇺🇾", group:"H", result:null },
+    { id:"j1g16", home:"Irán 🇮🇷", away:"Nueva Zelanda 🇳🇿", group:"G", result:null },
+    { id:"j1g17", home:"Francia 🇫🇷", away:"Senegal 🇸🇳", group:"I", result:null },
+    { id:"j1g18", home:"Irak 🇮🇶", away:"Noruega 🇳🇴", group:"I", result:null },
+    { id:"j1g19", home:"Argentina 🇦🇷", away:"Argelia 🇩🇿", group:"J", result:null },
+    { id:"j1g20", home:"Austria 🇦🇹", away:"Jordania 🇯🇴", group:"J", result:null },
+    { id:"j1g21", home:"Portugal 🇵🇹", away:"Congo RD 🇨🇩", group:"K", result:null },
+    { id:"j1g22", home:"Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿", away:"Croacia 🇭🇷", group:"L", result:null },
+    { id:"j1g23", home:"Ghana 🇬🇭", away:"Panamá 🇵🇦", group:"L", result:null },
+    { id:"j1g24", home:"Uzbekistán 🇺🇿", away:"Colombia 🇨🇴", group:"K", result:null }
   ] },
   { label: "Jornada 2 · 18–23 Jun", games: [
-    { id:"j2g01", home:"Czechia", away:"South Africa", group:"A", result:null },
-    { id:"j2g02", home:"Switzerland", away:"Bosnia and Herzegovina", group:"B", result:null },
-    { id:"j2g03", home:"Canada", away:"Qatar", group:"B", result:null },
-    { id:"j2g04", home:"Mexico", away:"Korea Republic", group:"A", result:null },
-    { id:"j2g05", home:"USA", away:"Australia", group:"D", result:null },
-    { id:"j2g06", home:"Scotland", away:"Morocco", group:"C", result:null },
-    { id:"j2g07", home:"Brazil", away:"Haiti", group:"C", result:null },
-    { id:"j2g08", home:"Türkiye", away:"Paraguay", group:"D", result:null },
-    { id:"j2g09", home:"Netherlands", away:"Sweden", group:"F", result:null },
-    { id:"j2g10", home:"Germany", away:"Ivory Coast", group:"E", result:null },
-    { id:"j2g11", home:"Ecuador", away:"Curacao", group:"E", result:null },
-    { id:"j2g12", home:"Tunisia", away:"Japan", group:"F", result:null },
-    { id:"j2g13", home:"Spain", away:"Saudi Arabia", group:"H", result:null },
-    { id:"j2g14", home:"Belgium", away:"IR Iran", group:"G", result:null },
-    { id:"j2g15", home:"Uruguay", away:"Cape Verde", group:"H", result:null },
-    { id:"j2g16", home:"New Zealand", away:"Egypt", group:"G", result:null },
-    { id:"j2g17", home:"Argentina", away:"Austria", group:"J", result:null },
-    { id:"j2g18", home:"France", away:"Iraq", group:"I", result:null },
-    { id:"j2g19", home:"Norway", away:"Senegal", group:"I", result:null },
-    { id:"j2g20", home:"Jordan", away:"Algeria", group:"J", result:null },
-    { id:"j2g21", home:"Portugal", away:"Uzbekistan", group:"K", result:null },
-    { id:"j2g22", home:"England", away:"Ghana", group:"L", result:null },
-    { id:"j2g23", home:"Panama", away:"Croatia", group:"L", result:null },
-    { id:"j2g24", home:"Colombia", away:"Congo DR", group:"K", result:null }
+    { id:"j2g01", home:"Chequia 🇨🇿", away:"Sudáfrica 🇿🇦", group:"A", result:null },
+    { id:"j2g02", home:"Suiza 🇨🇭", away:"Bosnia y Herzegovina 🇧🇦", group:"B", result:null },
+    { id:"j2g03", home:"Canadá 🇨🇦", away:"Catar 🇶🇦", group:"B", result:null },
+    { id:"j2g04", home:"México 🇲🇽", away:"Corea del Sur 🇰🇷", group:"A", result:null },
+    { id:"j2g05", home:"EE.UU. 🇺🇸", away:"Australia 🇦🇺", group:"D", result:null },
+    { id:"j2g06", home:"Escocia 🏴󠁧󠁢󠁳󠁣󠁴󠁿", away:"Marruecos 🇲🇦", group:"C", result:null },
+    { id:"j2g07", home:"Brasil 🇧🇷", away:"Haití 🇭🇹", group:"C", result:null },
+    { id:"j2g08", home:"Turquía 🇹🇷", away:"Paraguay 🇵🇾", group:"D", result:null },
+    { id:"j2g09", home:"Países Bajos 🇳🇱", away:"Suecia 🇸🇪", group:"F", result:null },
+    { id:"j2g10", home:"Alemania 🇩🇪", away:"Costa de Marfil 🇨🇮", group:"E", result:null },
+    { id:"j2g11", home:"Ecuador 🇪🇨", away:"Curazao 🇨🇼", group:"E", result:null },
+    { id:"j2g12", home:"Túnez 🇹🇳", away:"Japón 🇯🇵", group:"F", result:null },
+    { id:"j2g13", home:"España 🇪🇸", away:"Arabia Saudita 🇸🇦", group:"H", result:null },
+    { id:"j2g14", home:"Bélgica 🇧🇪", away:"Irán 🇮🇷", group:"G", result:null },
+    { id:"j2g15", home:"Uruguay 🇺🇾", away:"Cabo Verde 🇨🇻", group:"H", result:null },
+    { id:"j2g16", home:"Nueva Zelanda 🇳🇿", away:"Egipto 🇪🇬", group:"G", result:null },
+    { id:"j2g17", home:"Argentina 🇦🇷", away:"Austria 🇦🇹", group:"J", result:null },
+    { id:"j2g18", home:"Francia 🇫🇷", away:"Irak 🇮🇶", group:"I", result:null },
+    { id:"j2g19", home:"Noruega 🇳🇴", away:"Senegal 🇸🇳", group:"I", result:null },
+    { id:"j2g20", home:"Jordania 🇯🇴", away:"Argelia 🇩🇿", group:"J", result:null },
+    { id:"j2g21", home:"Portugal 🇵🇹", away:"Uzbekistán 🇺🇿", group:"K", result:null },
+    { id:"j2g22", home:"Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿", away:"Ghana 🇬🇭", group:"L", result:null },
+    { id:"j2g23", home:"Panamá 🇵🇦", away:"Croacia 🇭🇷", group:"L", result:null },
+    { id:"j2g24", home:"Colombia 🇨🇴", away:"Congo RD 🇨🇩", group:"K", result:null }
   ] },
   { label: "Jornada 3 · 24–27 Jun", games: [
-    { id:"j3g01", home:"Switzerland", away:"Canada", group:"B", result:null },
-    { id:"j3g02", home:"Bosnia and Herzegovina", away:"Qatar", group:"B", result:null },
-    { id:"j3g03", home:"Morocco", away:"Haiti", group:"C", result:null },
-    { id:"j3g04", home:"Scotland", away:"Brazil", group:"C", result:null },
-    { id:"j3g05", home:"South Africa", away:"Korea Republic", group:"A", result:null },
-    { id:"j3g06", home:"Czechia", away:"Mexico", group:"A", result:null },
-    { id:"j3g07", home:"Curacao", away:"Ivory Coast", group:"E", result:null },
-    { id:"j3g08", home:"Ecuador", away:"Germany", group:"E", result:null },
-    { id:"j3g09", home:"Tunisia", away:"Netherlands", group:"F", result:null },
-    { id:"j3g10", home:"Japan", away:"Sweden", group:"F", result:null },
-    { id:"j3g11", home:"Paraguay", away:"Australia", group:"D", result:null },
-    { id:"j3g12", home:"Türkiye", away:"USA", group:"D", result:null },
-    { id:"j3g13", home:"Norway", away:"France", group:"I", result:null },
-    { id:"j3g14", home:"Senegal", away:"Iraq", group:"I", result:null },
-    { id:"j3g15", home:"Uruguay", away:"Spain", group:"H", result:null },
-    { id:"j3g16", home:"Cape Verde", away:"Saudi Arabia", group:"H", result:null },
-    { id:"j3g17", home:"Egypt", away:"IR Iran", group:"G", result:null },
-    { id:"j3g18", home:"New Zealand", away:"Belgium", group:"G", result:null },
-    { id:"j3g19", home:"Croatia", away:"Ghana", group:"L", result:null },
-    { id:"j3g20", home:"Panama", away:"England", group:"L", result:null },
-    { id:"j3g21", home:"Congo DR", away:"Uzbekistan", group:"K", result:null },
-    { id:"j3g22", home:"Colombia", away:"Portugal", group:"K", result:null },
-    { id:"j3g23", home:"Algeria", away:"Austria", group:"J", result:null },
-    { id:"j3g24", home:"Jordan", away:"Argentina", group:"J", result:null }
+    { id:"j3g01", home:"Suiza 🇨🇭", away:"Canadá 🇨🇦", group:"B", result:null },
+    { id:"j3g02", home:"Bosnia y Herzegovina 🇧🇦", away:"Catar 🇶🇦", group:"B", result:null },
+    { id:"j3g03", home:"Marruecos 🇲🇦", away:"Haití 🇭🇹", group:"C", result:null },
+    { id:"j3g04", home:"Escocia 🏴󠁧󠁢󠁳󠁣󠁴󠁿", away:"Brasil 🇧🇷", group:"C", result:null },
+    { id:"j3g05", home:"Sudáfrica 🇿🇦", away:"Corea del Sur 🇰🇷", group:"A", result:null },
+    { id:"j3g06", home:"Chequia 🇨🇿", away:"México 🇲🇽", group:"A", result:null },
+    { id:"j3g07", home:"Curazao 🇨🇼", away:"Costa de Marfil 🇨🇮", group:"E", result:null },
+    { id:"j3g08", home:"Ecuador 🇪🇨", away:"Alemania 🇩🇪", group:"E", result:null },
+    { id:"j3g09", home:"Túnez 🇹🇳", away:"Países Bajos 🇳🇱", group:"F", result:null },
+    { id:"j3g10", home:"Japón 🇯🇵", away:"Suecia 🇸🇪", group:"F", result:null },
+    { id:"j3g11", home:"Paraguay 🇵🇾", away:"Australia 🇦🇺", group:"D", result:null },
+    { id:"j3g12", home:"Turquía 🇹🇷", away:"EE.UU. 🇺🇸", group:"D", result:null },
+    { id:"j3g13", home:"Noruega 🇳🇴", away:"Francia 🇫🇷", group:"I", result:null },
+    { id:"j3g14", home:"Senegal 🇸🇳", away:"Irak 🇮🇶", group:"I", result:null },
+    { id:"j3g15", home:"Uruguay 🇺🇾", away:"España 🇪🇸", group:"H", result:null },
+    { id:"j3g16", home:"Cabo Verde 🇨🇻", away:"Arabia Saudita 🇸🇦", group:"H", result:null },
+    { id:"j3g17", home:"Egipto 🇪🇬", away:"Irán 🇮🇷", group:"G", result:null },
+    { id:"j3g18", home:"Nueva Zelanda 🇳🇿", away:"Bélgica 🇧🇪", group:"G", result:null },
+    { id:"j3g19", home:"Croacia 🇭🇷", away:"Ghana 🇬🇭", group:"L", result:null },
+    { id:"j3g20", home:"Panamá 🇵🇦", away:"Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿", group:"L", result:null },
+    { id:"j3g21", home:"Congo RD 🇨🇩", away:"Uzbekistán 🇺🇿", group:"K", result:null },
+    { id:"j3g22", home:"Colombia 🇨🇴", away:"Portugal 🇵🇹", group:"K", result:null },
+    { id:"j3g23", home:"Argelia 🇩🇿", away:"Austria 🇦🇹", group:"J", result:null },
+    { id:"j3g24", home:"Jordania 🇯🇴", away:"Argentina 🇦🇷", group:"J", result:null }
   ] }
 ];
 
 const ALL_GAMES = JORNADAS.flatMap(j => j.games.map(g => ({ ...g, jornada: j.label })));
 
 // --------------------------------------------------------------
-// PREDICCIONES REALES (Jornada 1, matches 1 a 12)
-// Los partidos 13 a 24 de J1, y toda J2/J3 no tienen pronóstico.
+// PREDICCIONES REALES (Jornada 1, matches 1 a 16)
 // --------------------------------------------------------------
 const PREDICTIONS_DATA = {
-  // Match 1: Mexico vs South Africa
-  j1g01: {
-    Cristina:"L", Consuelo:"E", Noe:"V", Jessica:"E", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L"
-  },
-  // Match 2: Korea Republic vs Czechia
-  j1g02: {
-    Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"E", David:"V", Diana:"V", Julio:"E", Luis:"L", "Jose D":"E", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"E", Miros:"L", Nacho:"E", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"L", "Miguel R":"E", Maria:"L", Miguelito:"E", Bryan:"L"
-  },
-  // Match 3: Canada vs Bosnia
-  j1g03: {
-    Cristina:"V", Consuelo:"L", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"E", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"V", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"V", Miguelito:"L", Bryan:"L"
-  },
-  // Match 4: USA vs Paraguay
-  j1g04: {
-    Cristina:"L", Consuelo:"E", Noe:"E", Jessica:"V", David:"E", Diana:"V", Julio:"L", Luis:"V", "Jose D":"E", Patron:"E", "Julio Jr":"L", Andres:"V", Jorge:"V", Papa:"L", KJ:"L", Yuny:"L", Miros:"V", Nacho:"V", Tony:"E", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"E", Maria:"L", Miguelito:"V", Bryan:"L"
-  },
-  // Match 5: Qatar vs Switzerland
-  j1g05: {
-    Cristina:"L", Consuelo:"L", Noe:"E", Jessica:"V", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"L", Papa:"V", KJ:"V", Yuny:"V", Miros:"L", Nacho:"V", Tony:"V", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"E", Maria:"L", Miguelito:"E", Bryan:"V"
-  },
-  // Match 6: Brazil vs Morocco
-  j1g06: {
-    Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L"
-  },
-  // Match 7: Haiti vs Scotland
-  j1g07: {
-    Cristina:"L", Consuelo:"V", Noe:"E", Jessica:"E", David:"V", Diana:"E", Julio:"E", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"L", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"V", Speedy:"E", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", Maria:"V", Miguelito:"E", Bryan:"V"
-  },
-  // Match 8: Australia vs Türkiye
-  j1g08: {
-    Cristina:"V", Consuelo:"L", Noe:"E", Jessica:"V", David:"E", Diana:"V", Julio:"L", Luis:"L", "Jose D":"E", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"L", KJ:"E", Yuny:"E", Miros:"V", Nacho:"E", Tony:"L", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"E"
-  },
-  // Match 9: Germany vs Curacao
-  j1g09: {
-    Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"E", David:"L", Diana:"L", Julio:"E", Luis:"L", "Jose D":"L", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L"
-  },
-  // Match 10: Netherlands vs Japan
-  j1g10: {
-    Cristina:"V", Consuelo:"L", Noe:"L", Jessica:"V", David:"V", Diana:"L", Julio:"V", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"E", Papa:"V", KJ:"L", Yuny:"L", Miros:"E", Nacho:"E", Tony:"L", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", Maria:"E", Miguelito:"V", Bryan:"L"
-  },
-  // Match 11: Ivory Coast vs Ecuador
-  j1g11: {
-    Cristina:"V", Consuelo:"V", Noe:"L", Jessica:"E", David:"E", Diana:"V", Julio:"L", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"E", Miros:"V", Nacho:"V", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"E", Maria:"V", Miguelito:"E", Bryan:"L"
-  },
-  // Match 12: Sweden vs Tunisia
-  j1g12: {
-    Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"E"
-  }
-  // Los partidos 13 al 24 de Jornada 1, y todas las jornadas 2 y 3 quedan sin pronóstico.
+  // Match 1-12 ya existentes (no se modifican)
+  j1g01: { Cristina:"L", Consuelo:"E", Noe:"V", Jessica:"E", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L" },
+  j1g02: { Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"E", David:"V", Diana:"V", Julio:"E", Luis:"L", "Jose D":"E", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"E", Miros:"L", Nacho:"E", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"L", "Miguel R":"E", Maria:"L", Miguelito:"E", Bryan:"L" },
+  j1g03: { Cristina:"V", Consuelo:"L", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"E", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"V", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"V", Miguelito:"L", Bryan:"L" },
+  j1g04: { Cristina:"L", Consuelo:"E", Noe:"E", Jessica:"V", David:"E", Diana:"V", Julio:"L", Luis:"V", "Jose D":"E", Patron:"E", "Julio Jr":"L", Andres:"V", Jorge:"V", Papa:"L", KJ:"L", Yuny:"L", Miros:"V", Nacho:"V", Tony:"E", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"E", Maria:"L", Miguelito:"V", Bryan:"L" },
+  j1g05: { Cristina:"L", Consuelo:"L", Noe:"E", Jessica:"V", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"L", Papa:"V", KJ:"V", Yuny:"V", Miros:"L", Nacho:"V", Tony:"V", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"E", Maria:"L", Miguelito:"E", Bryan:"V" },
+  j1g06: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L" },
+  j1g07: { Cristina:"L", Consuelo:"V", Noe:"E", Jessica:"E", David:"V", Diana:"E", Julio:"E", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"L", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"V", Speedy:"E", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", Maria:"V", Miguelito:"E", Bryan:"V" },
+  j1g08: { Cristina:"V", Consuelo:"L", Noe:"E", Jessica:"V", David:"E", Diana:"V", Julio:"L", Luis:"L", "Jose D":"E", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"L", KJ:"E", Yuny:"E", Miros:"V", Nacho:"E", Tony:"L", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"E" },
+  j1g09: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"E", David:"L", Diana:"L", Julio:"E", Luis:"L", "Jose D":"L", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L" },
+  j1g10: { Cristina:"V", Consuelo:"L", Noe:"L", Jessica:"V", David:"V", Diana:"L", Julio:"V", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"E", Papa:"V", KJ:"L", Yuny:"L", Miros:"E", Nacho:"E", Tony:"L", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", Maria:"E", Miguelito:"V", Bryan:"L" },
+  j1g11: { Cristina:"V", Consuelo:"V", Noe:"L", Jessica:"E", David:"E", Diana:"V", Julio:"L", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"E", Miros:"V", Nacho:"V", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"E", Maria:"V", Miguelito:"E", Bryan:"L" },
+  j1g12: { Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"E" },
+  // Match 13: España vs Cabo Verde
+  j1g13: { Cristina:"E", Consuelo:"L", Noe:"L", Jessica:"L", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"E", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L" },
+  // Match 14: Bélgica vs Egipto
+  j1g14: { Cristina:"V", Consuelo:"L", Noe:"V", Jessica:"V", David:"L", Diana:"L", Julio:"V", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"V", Papa:"L", KJ:"L", Yuny:"L", Miros:"E", Nacho:"L", Tony:"L", Speedy:"E", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L" },
+  // Match 15: Arabia Saudita vs Uruguay
+  j1g15: { Cristina:"V", Consuelo:"E", Noe:"L", Jessica:"E", David:"E", Diana:"V", Julio:"E", Luis:"V", "Jose D":"V", Patron:"E", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"L", Speedy:"V", "Carlos G":"L", "Miguel C":"L", "Miguel R":"V", Maria:"V", Miguelito:"V", Bryan:"V" },
+  // Match 16: Irán vs Nueva Zelanda
+  j1g16: { Cristina:"V", Consuelo:"V", Noe:"L", Jessica:"E", David:"E", Diana:"L", Julio:"L", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"E", Andres:"V", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"E", "Carlos G":"E", "Miguel C":"V", "Miguel R":"E", Maria:"E", Miguelito:"E", Bryan:"L" }
 };
 
 const PARTICIPANT_NAMES = [
