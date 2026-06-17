@@ -49,7 +49,7 @@
     .rank-num.top3{color:#e8c547}
     .avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;border:2px solid rgba(255,255,255,0.2)}
     .card-info{flex:1}
-    .card-name{font-size:17px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .card-name{font-size:17px;font-weight:700}
     .card-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px}
     .view-btn{margin-top:8px;background:rgba(255,255,255,0.12);border:none;color:#fff;border-radius:40px;padding:6px 12px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
     .card-right{text-align:right;flex-shrink:0}
@@ -84,9 +84,11 @@
     .legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;background:rgba(0,0,0,0.3);padding:8px 12px;border-radius:30px;margin:8px 12px 0;font-size:12px;font-weight:500}
     .legend span{display:inline-flex;align-items:center;gap:4px}
     .legend .box{display:inline-block;width:18px;height:18px;border-radius:4px}
-    .filter-row{display:flex;gap:6px;padding:8px 12px 2px;overflow-x:auto}
+    .filter-row{display:flex;gap:6px;padding:8px 12px 2px;overflow-x:auto;flex-wrap:wrap}
     .filter-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);border-radius:30px;padding:6px 14px;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0}
     .filter-btn.active{background:#c9a227;color:#0a1628;border-color:#c9a227;font-weight:700}
+    .jornada-filter-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);border-radius:30px;padding:4px 10px;font-size:11px;cursor:pointer;white-space:nowrap}
+    .jornada-filter-btn.active{background:rgba(201,162,39,0.3);color:#e8c547;border-color:#c9a227}
     .fullscreen-btn{background:rgba(201,162,39,0.2);border:1px solid rgba(201,162,39,0.4);color:#e8c547;border-radius:30px;padding:4px 10px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
     .games-badge{font-size:11px;background:rgba(255,255,255,0.15);color:#ddd;border-radius:30px;padding:3px 10px;margin-left:6px}
     .group-badge{font-size:9px;background:rgba(0,0,0,0.5);border-radius:16px;padding:2px 6px;margin-left:6px;font-weight:400}
@@ -133,7 +135,7 @@
     .no-results{text-align:center;color:rgba(255,255,255,0.5);padding:30px;font-size:15px}
     .export-btn{background:rgba(201,162,39,0.2);border:1px solid rgba(201,162,39,0.4);color:#e8c547;border-radius:30px;padding:4px 12px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
     .btn-toggle-editor{background:rgba(201,162,39,0.15);border:1px solid rgba(201,162,39,0.3);color:#e8c547;border-radius:30px;padding:4px 12px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
-    @media(max-width:480px){.stats-summary{grid-template-columns:repeat(4,1fr)}.stats-summary .stat .num{font-size:15px}}
+    @media(max-width:480px){.filter-row{flex-wrap:wrap}}
   </style>
 </head>
 <body>
@@ -161,7 +163,7 @@
       <button class="btn-update" id="updateResultBtn">Actualizar</button>
       <button class="btn-close" id="closeEditorBtn">✕</button>
     </div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px">Los cambios son temporales (se pierden al recargar). Para guardar permanentemente, edita el código.</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px">Los cambios son temporales (se pierden al recargar).</div>
   </div>
 
   <div class="search-wrap">
@@ -173,6 +175,13 @@
     <button class="filter-btn active" data-view="cards">🃏 Tarjetas</button>
     <button class="filter-btn" data-view="table">🏆 Líderes</button>
     <button class="filter-btn" data-view="matrix">📊 La Tabla</button>
+  </div>
+
+  <div class="filter-row" id="jornadaFilters" style="display:none;">
+    <button class="jornada-filter-btn active" data-jornada="all">Todas</button>
+    <button class="jornada-filter-btn" data-jornada="0">Jornada 1</button>
+    <button class="jornada-filter-btn" data-jornada="1">Jornada 2</button>
+    <button class="jornada-filter-btn" data-jornada="2">Jornada 3</button>
   </div>
 
   <div class="section-title">🏆 Podio</div>
@@ -264,20 +273,19 @@ const JORNADAS = [
     { id:"j3g05", home:"Sudáfrica 🇿🇦", away:"Corea del Sur 🇰🇷", group:"A", result:null }, { id:"j3g06", home:"Chequia 🇨🇿", away:"México 🇲🇽", group:"A", result:null },
     { id:"j3g07", home:"Curazao 🇨🇼", away:"Costa de Marfil 🇨🇮", group:"E", result:null }, { id:"j3g08", home:"Ecuador 🇪🇨", away:"Alemania 🇩🇪", group:"E", result:null },
     { id:"j3g09", home:"Túnez 🇹🇳", away:"Países Bajos 🇳🇱", group:"F", result:null }, { id:"j3g10", home:"Japón 🇯🇵", away:"Suecia 🇸🇪", group:"F", result:null },
-    { id:"j3g11", home:"Paraguay 🇵🇾", away:"Australia 🇦🇺", group:"D", result:null }, { id:"j3g12", home:"Turquía 🇹🇷", away:"EE.UU. 🇺🇸", group:"D", result:null },
+    { id:"j3g11", home:"Turquía 🇹🇷", away:"EE.UU. 🇺🇸", group:"D", result:null }, { id:"j3g12", home:"Paraguay 🇵🇾", away:"Australia 🇦🇺", group:"D", result:null },
     { id:"j3g13", home:"Noruega 🇳🇴", away:"Francia 🇫🇷", group:"I", result:null }, { id:"j3g14", home:"Senegal 🇸🇳", away:"Irak 🇮🇶", group:"I", result:null },
-    { id:"j3g15", home:"Uruguay 🇺🇾", away:"España 🇪🇸", group:"H", result:null }, { id:"j3g16", home:"Cabo Verde 🇨🇻", away:"Arabia Saudita 🇸🇦", group:"H", result:null },
-    { id:"j3g17", home:"Egipto 🇪🇬", away:"Irán 🇮🇷", group:"G", result:null }, { id:"j3g18", home:"Nueva Zelanda 🇳🇿", away:"Bélgica 🇧🇪", group:"G", result:null },
-    { id:"j3g19", home:"Croacia 🇭🇷", away:"Ghana 🇬🇭", group:"L", result:null }, { id:"j3g20", home:"Panamá 🇵🇦", away:"Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿", group:"L", result:null },
-    { id:"j3g21", home:"Congo RD 🇨🇩", away:"Uzbekistán 🇺🇿", group:"K", result:null }, { id:"j3g22", home:"Colombia 🇨🇴", away:"Portugal 🇵🇹", group:"K", result:null },
+    { id:"j3g15", home:"Cabo Verde 🇨🇻", away:"Arabia Saudita 🇸🇦", group:"H", result:null }, { id:"j3g16", home:"Uruguay 🇺🇾", away:"España 🇪🇸", group:"H", result:null },
+    { id:"j3g17", home:"Nueva Zelanda 🇳🇿", away:"Bélgica 🇧🇪", group:"G", result:null }, { id:"j3g18", home:"Egipto 🇪🇬", away:"Irán 🇮🇷", group:"G", result:null },
+    { id:"j3g19", home:"Panamá 🇵🇦", away:"Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿", group:"L", result:null }, { id:"j3g20", home:"Croacia 🇭🇷", away:"Ghana 🇬🇭", group:"L", result:null },
+    { id:"j3g21", home:"Colombia 🇨🇴", away:"Portugal 🇵🇹", group:"K", result:null }, { id:"j3g22", home:"Congo RD 🇨🇩", away:"Uzbekistán 🇺🇿", group:"K", result:null },
     { id:"j3g23", home:"Argelia 🇩🇿", away:"Austria 🇦🇹", group:"J", result:null }, { id:"j3g24", home:"Jordania 🇯🇴", away:"Argentina 🇦🇷", group:"J", result:null }
   ] }
-];
-
-// ============================================================
-// PREDICCIONES (completas)
+];// ============================================================
+// PREDICCIONES COMPLETAS (Jornada 1, 2 y 3)
 // ============================================================
 const PREDICTIONS_DATA = {
+  // ========== JORNADA 1 (24 partidos) ==========
   j1g01: { Cristina:"L", Consuelo:"E", Noe:"V", Jessica:"E", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L" },
   j1g02: { Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"E", David:"V", Diana:"V", Julio:"E", Luis:"L", "Jose D":"E", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"E", Miros:"L", Nacho:"E", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"L", "Miguel R":"E", Maria:"L", Miguelito:"E", Bryan:"L" },
   j1g03: { Cristina:"V", Consuelo:"L", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"E", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"V", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"V", Miguelito:"L", Bryan:"L" },
@@ -301,17 +309,68 @@ const PREDICTIONS_DATA = {
   j1g21: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"V", Diana:"L", Julio:"E", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L" },
   j1g22: { Cristina:"V", Consuelo:"L", Noe:"V", Jessica:"E", David:"L", Diana:"L", Julio:"V", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"E", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"E", Tony:"E", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"E", Maria:"E", Miguelito:"V", Bryan:"L" },
   j1g23: { Cristina:"V", Consuelo:"L", Noe:"V", Jessica:"L", David:"V", Diana:"E", Julio:"V", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"V", Papa:"L", KJ:"L", Yuny:"E", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", Maria:"L", Miguelito:"V", Bryan:"V" },
-  j1g24: { Cristina:"V", Consuelo:"E", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"L", Nacho:"V", Tony:"L", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", Maria:"L", Miguelito:"V", Bryan:"V" }
-};
+  j1g24: { Cristina:"V", Consuelo:"E", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"L", Nacho:"V", Tony:"L", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", Maria:"L", Miguelito:"V", Bryan:"V" },
 
-const PARTICIPANT_NAMES = ["Cristina","Consuelo","Noe","Jessica","David","Diana","Julio","Luis","Jose D","Patron","Julio Jr","Andres","Jorge","Papa","KJ","Yuny","Miros","Nacho","Tony","Speedy","Carlos G","Miguel C","Miguel R","Maria","Miguelito","Bryan"];
+  // ========== JORNADA 2 (24 partidos) ==========
+  j2g01: { Cristina:"V", Consuelo:"V", Noe:"V", Jessica:"E", David:"L", Diana:"V", Julio:"V", Luis:"V", "Jose D":"E", Patron:"L", "Julio Jr":"L", Andres:"E", Jorge:"E", Papa:"V", KJ:"L", Yuny:"L", Miros:"E", Nacho:"L", Tony:"L", Speedy:"E", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"L", Bryan:"V" },
+  j2g02: { Cristina:"V", Consuelo:"E", Noe:"L", Jessica:"V", David:"L", Diana:"E", Julio:"L", Luis:"L", "Jose D":"L", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"E", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"L", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"L" },
+  j2g03: { Cristina:"V", Consuelo:"L", Noe:"L", Jessica:"E", David:"E", Diana:"V", Julio:"L", Luis:"L", "Jose D":"L", Patron:"V", "Julio Jr":"E", Andres:"E", Jorge:"E", Papa:"V", KJ:"E", Yuny:"L", Miros:"L", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", "Miguelito":"L", Maria:"V", Bryan:"L" },
+  j2g04: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"L", David:"L", Diana:"L", Julio:"E", Luis:"V", "Jose D":"L", Patron:"L", "Julio Jr":"E", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"E", Miros:"V", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g05: { Cristina:"L", Consuelo:"L", Noe:"E", Jessica:"V", David:"L", Diana:"E", Julio:"L", Luis:"V", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", "Miguelito":"E", Maria:"L", Bryan:"L" },
+  j2g06: { Cristina:"V", Consuelo:"V", Noe:"V", Jessica:"E", David:"E", Diana:"V", Julio:"L", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"L", KJ:"V", Yuny:"E", Miros:"L", Nacho:"E", Tony:"E", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"E", Bryan:"V" },
+  j2g07: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"E", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g08: { Cristina:"E", Consuelo:"V", Noe:"V", Jessica:"E", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"E", Patron:"V", "Julio Jr":"L", Andres:"V", Jorge:"V", Papa:"V", KJ:"L", Yuny:"L", Miros:"V", Nacho:"V", Tony:"V", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"L", Bryan:"L" },
+  j2g09: { Cristina:"V", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"V", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"E", Tony:"E", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g10: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"E", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g11: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"E", David:"E", Diana:"L", Julio:"L", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"E", Bryan:"L" },
+  j2g12: { Cristina:"V", Consuelo:"L", Noe:"V", Jessica:"L", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"L", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"V", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"V" },
+  j2g13: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"E", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g14: { Cristina:"V", Consuelo:"E", Noe:"L", Jessica:"E", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"E", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g15: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"E", David:"E", Diana:"L", Julio:"L", Luis:"L", "Jose D":"V", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g16: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"V", Diana:"L", Julio:"L", Luis:"L", "Jose D":"E", Patron:"V", "Julio Jr":"V", Andres:"L", Jorge:"E", Papa:"L", KJ:"V", Yuny:"V", Miros:"L", Nacho:"E", Tony:"E", Speedy:"V", "Carlos G":"L", "Miguel C":"L", "Miguel R":"V", "Miguelito":"V", Maria:"L", Bryan:"V" },
+  j2g17: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"L", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g18: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"L", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g19: { Cristina:"L", Consuelo:"E", Noe:"V", Jessica:"L", David:"E", Diana:"E", Julio:"V", Luis:"V", "Jose D":"E", Patron:"L", "Julio Jr":"E", Andres:"L", Jorge:"E", Papa:"V", KJ:"L", Yuny:"L", Miros:"V", Nacho:"L", Tony:"E", Speedy:"E", "Carlos G":"E", "Miguel C":"L", "Miguel R":"E", "Miguelito":"E", Maria:"E", Bryan:"L" },
+  j2g20: { Cristina:"V", Consuelo:"E", Noe:"V", Jessica:"E", David:"L", Diana:"V", Julio:"V", Luis:"V", "Jose D":"E", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"E", Papa:"L", KJ:"V", Yuny:"E", Miros:"V", Nacho:"E", Tony:"V", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", "Miguelito":"E", Maria:"E", Bryan:"E" },
+  j2g21: { Cristina:"E", Consuelo:"L", Noe:"L", Jessica:"V", David:"E", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"V", Miros:"L", Nacho:"V", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j2g22: { Cristina:"V", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"E", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"E", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", "Miguelito":"V", Maria:"L", Bryan:"L" },
+  j2g23: { Cristina:"V", Consuelo:"E", Noe:"V", Jessica:"L", David:"V", Diana:"L", Julio:"E", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"L", Papa:"L", KJ:"V", Yuny:"L", Miros:"V", Nacho:"V", Tony:"V", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"V", "Miguelito":"L", Maria:"V", Bryan:"V" },
+  j2g24: { Cristina:"L", Consuelo:"L", Noe:"E", Jessica:"L", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+
+  // ========== JORNADA 3 (24 partidos) ==========
+  j3g01: { Cristina:"V", Consuelo:"E", Noe:"L", Jessica:"L", David:"L", Diana:"E", Julio:"V", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"V", Papa:"L", KJ:"L", Yuny:"E", Miros:"E", Nacho:"E", Tony:"L", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"L", Bryan:"L" },
+  j3g02: { Cristina:"V", Consuelo:"V", Noe:"L", Jessica:"L", David:"L", Diana:"L", Julio:"E", Luis:"L", "Jose D":"E", Patron:"E", "Julio Jr":"L", Andres:"E", Jorge:"V", Papa:"V", KJ:"L", Yuny:"L", Miros:"V", Nacho:"E", Tony:"L", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"E", "Miguelito":"E", Maria:"V", Bryan:"L" },
+  j3g03: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"L", David:"L", Diana:"V", Julio:"V", Luis:"V", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"V", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j3g04: { Cristina:"L", Consuelo:"V", Noe:"V", Jessica:"L", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"L", Miros:"V", Nacho:"E", Tony:"V", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"V" },
+  j3g05: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"E", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"L", Papa:"V", KJ:"V", Yuny:"V", Miros:"L", Nacho:"E", Tony:"V", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"L", "Miguelito":"L", Maria:"E", Bryan:"E" },
+  j3g06: { Cristina:"V", Consuelo:"V", Noe:"V", Jessica:"V", David:"V", Diana:"V", Julio:"V", Luis:"L", "Jose D":"V", Patron:"E", "Julio Jr":"V", Andres:"V", Jorge:"E", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"V", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"L", Bryan:"V" },
+  j3g07: { Cristina:"E", Consuelo:"V", Noe:"L", Jessica:"L", David:"V", Diana:"E", Julio:"L", Luis:"V", "Jose D":"V", Patron:"V", "Julio Jr":"V", Andres:"E", Jorge:"L", Papa:"L", KJ:"V", Yuny:"V", Miros:"L", Nacho:"E", Tony:"V", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"E", Bryan:"V" },
+  j3g08: { Cristina:"L", Consuelo:"V", Noe:"L", Jessica:"E", David:"V", Diana:"L", Julio:"V", Luis:"L", "Jose D":"E", Patron:"L", "Julio Jr":"E", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"E", Tony:"E", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"V" },
+  j3g09: { Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"V", David:"E", Diana:"V", Julio:"V", Luis:"L", "Jose D":"E", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"E", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"E", Tony:"V", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"E", Maria:"V", Bryan:"V" },
+  j3g10: { Cristina:"L", Consuelo:"L", Noe:"E", Jessica:"V", David:"L", Diana:"L", Julio:"V", Luis:"L", "Jose D":"E", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"E", Miros:"L", Nacho:"E", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"V", Bryan:"E" },
+  j3g11: { Cristina:"V", Consuelo:"E", Noe:"L", Jessica:"V", David:"E", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"V", Yuny:"L", Miros:"V", Nacho:"E", Tony:"L", Speedy:"V", "Carlos G":"E", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"L", Bryan:"E" },
+  j3g12: { Cristina:"E", Consuelo:"L", Noe:"V", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"V", "Jose D":"L", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"V", "Miguelito":"L", Maria:"V", Bryan:"L" },
+  j3g13: { Cristina:"E", Consuelo:"E", Noe:"V", Jessica:"V", David:"V", Diana:"V", Julio:"V", Luis:"L", "Jose D":"V", Patron:"E", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"E", Tony:"V", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"V" },
+  j3g14: { Cristina:"V", Consuelo:"V", Noe:"L", Jessica:"V", David:"L", Diana:"E", Julio:"L", Luis:"V", "Jose D":"E", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"E", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"V", Bryan:"L" },
+  j3g15: { Cristina:"V", Consuelo:"E", Noe:"L", Jessica:"V", David:"L", Diana:"E", Julio:"V", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"E", Tony:"L", Speedy:"E", "Carlos G":"E", "Miguel C":"V", "Miguel R":"E", "Miguelito":"V", Maria:"V", Bryan:"V" },
+  j3g16: { Cristina:"L", Consuelo:"E", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"V", Luis:"L", "Jose D":"E", Patron:"V", "Julio Jr":"E", Andres:"V", Jorge:"L", Papa:"V", KJ:"V", Yuny:"E", Miros:"V", Nacho:"E", Tony:"E", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"V" },
+  j3g17: { Cristina:"V", Consuelo:"E", Noe:"V", Jessica:"V", David:"V", Diana:"V", Julio:"L", Luis:"E", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"E", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"E", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"V" },
+  j3g18: { Cristina:"L", Consuelo:"V", Noe:"V", Jessica:"V", David:"L", Diana:"V", Julio:"L", Luis:"E", "Jose D":"E", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"E", Nacho:"E", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"E", Maria:"L", Bryan:"L" },
+  j3g19: { Cristina:"L", Consuelo:"V", Noe:"L", Jessica:"L", David:"V", Diana:"V", Julio:"V", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"L", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"V" },
+  j3g20: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"V", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"E", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
+  j3g21: { Cristina:"L", Consuelo:"V", Noe:"V", Jessica:"L", David:"L", Diana:"V", Julio:"V", Luis:"V", "Jose D":"E", Patron:"L", "Julio Jr":"V", Andres:"L", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"E", Tony:"E", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"E" },
+  j3g22: { Cristina:"L", Consuelo:"L", Noe:"V", Jessica:"L", David:"E", Diana:"V", Julio:"L", Luis:"V", "Jose D":"E", Patron:"L", "Julio Jr":"V", Andres:"L", Jorge:"E", Papa:"L", KJ:"L", Yuny:"L", Miros:"E", Nacho:"V", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"E", "Miguelito":"E", Maria:"V", Bryan:"L" },
+  j3g23: { Cristina:"V", Consuelo:"V", Noe:"V", Jessica:"L", David:"L", Diana:"V", Julio:"L", Luis:"V", "Jose D":"E", Patron:"L", "Julio Jr":"V", Andres:"L", Jorge:"L", Papa:"V", KJ:"V", Yuny:"V", Miros:"V", Nacho:"E", Tony:"V", Speedy:"L", "Carlos G":"E", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"L" },
+  j3g24: { Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"V", David:"V", Diana:"V", Julio:"V", Luis:"L", "Jose D":"V", Patron:"E", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"L", KJ:"V", Yuny:"V", Miros:"V", Nacho:"V", Tony:"L", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"V" }
+};const PARTICIPANT_NAMES = ["Cristina","Consuelo","Noe","Jessica","David","Diana","Julio","Luis","Jose D","Patron","Julio Jr","Andres","Jorge","Papa","KJ","Yuny","Miros","Nacho","Tony","Speedy","Carlos G","Miguel C","Miguel R","Maria","Miguelito","Bryan"];
 const PARTICIPANT_COLORS = { Cristina:"#ec4899", Consuelo:"#f97316", Noe:"#3b82f6", Jessica:"#a855f7", David:"#10b981", Diana:"#f43f5e", Julio:"#eab308", Luis:"#06b6d4", "Jose D":"#8b5cf6", Patron:"#84cc16", "Julio Jr":"#fb923c", Andres:"#14b8a6", Jorge:"#ef4444", Papa:"#f59e0b", KJ:"#6366f1", Yuny:"#d946ef", Miros:"#0ea5e9", Nacho:"#f472b6", Tony:"#22d3ee", Speedy:"#a3e635", "Carlos G":"#34d399", "Miguel C":"#fb7185", "Miguel R":"#818cf8", Maria:"#f0abfc", Miguelito:"#c084fc", Bryan:"#38bdf8" };
 
 let currentView = "cards";
 let searchVal = "";
+let selectedJornada = "all";
 
 function getGames() {
-  return JORNADAS.flatMap(j => j.games.map(g => ({ ...g, jornada: j.label })));
+  return JORNADAS.flatMap((j, idx) => j.games.map(g => ({ ...g, jornada: j.label, jornadaIdx: idx })));
 }
 
 function getParticipants() {
@@ -349,7 +408,6 @@ function computeRankings() {
     }
     rank++;
   }
-  
   return scored;
 }
 
@@ -429,7 +487,11 @@ function renderMatrix() {
   if(!filtered.length){ container.innerHTML=""; noRes.style.display="block"; return; }
   noRes.style.display="none";
   
-  const games = getGames();
+  let games = getGames();
+  if (selectedJornada !== "all") {
+    games = games.filter(g => g.jornadaIdx === parseInt(selectedJornada));
+  }
+  
   let html = `<div class="legend">
     <span><div class="box" style="background:#22c55e60;"></div> 🟢 Local (L)</span>
     <span><div class="box" style="background:#eab30860;"></div> 🟡 Empate (E)</span>
@@ -470,6 +532,14 @@ function setView(view) {
   currentView = view;
   document.querySelectorAll("[data-view]").forEach(b => b.classList.remove("active"));
   document.querySelector(`[data-view="${view}"]`)?.classList.add("active");
+  
+  const jornadaFilters = document.getElementById("jornadaFilters");
+  if (view === "matrix") {
+    jornadaFilters.style.display = "flex";
+  } else {
+    jornadaFilters.style.display = "none";
+  }
+  
   const cardsDiv = document.getElementById("cardsList");
   const tableDiv = document.getElementById("tableView");
   const matrixDiv = document.getElementById("matrixView");
@@ -529,22 +599,16 @@ function populateEditor() {
 function updateResult() {
   const matchId = document.getElementById("matchSelect").value;
   const result = document.getElementById("resultSelect").value;
-  
   if (!matchId) return;
-  
   for (const j of JORNADAS) {
     for (const g of j.games) {
       if (g.id === matchId) {
-        if (result === 'clear') {
-          g.result = null;
-        } else if (result) {
-          g.result = result;
-        }
+        if (result === 'clear') { g.result = null; } 
+        else if (result) { g.result = result; }
         break;
       }
     }
   }
-  
   renderAll();
   populateEditor();
   document.getElementById("resultSelect").value = "";
@@ -554,7 +618,6 @@ function exportPDF() {
   const ranked = computeRankings();
   const games = getGames();
   const played = games.filter(g => g.result !== null).length;
-  
   let html = `
     <div style="font-family:Arial,sans-serif;padding:20px;background:#0a1628;color:#fff;max-width:800px;margin:0 auto;">
       <h1 style="color:#e8c547;text-align:center;">⚽ Quiniela Mundial 2026</h1>
@@ -562,37 +625,32 @@ function exportPDF() {
       <hr style="border-color:#333;margin:16px 0;">
       <h2 style="color:#e8c547;">🏆 Clasificación</h2>
       <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;">
-        <thead><tr style="background:#1a3a5c;">
-          <th style="padding:8px;text-align:center;color:#e8c547;">#</th>
-          <th style="padding:8px;text-align:left;color:#e8c547;">Participante</th>
-          <th style="padding:8px;text-align:center;color:#e8c547;">✅</th>
-          <th style="padding:8px;text-align:center;color:#e8c547;">❌</th>
-          <th style="padding:8px;text-align:center;color:#e8c547;">⏳</th>
-          <th style="padding:8px;text-align:center;color:#e8c547;">Pts</th>
-        </tr></thead>
-        <tbody>
-  `;
+        <thead><tr style="background:#1a3a5c;"><th style="padding:8px;text-align:center;color:#e8c547;">#</th><th style="padding:8px;text-align:left;color:#e8c547;">Participante</th><th style="padding:8px;text-align:center;color:#e8c547;">✅</th><th style="padding:8px;text-align:center;color:#e8c547;">❌</th><th style="padding:8px;text-align:center;color:#e8c547;">⏳</th><th style="padding:8px;text-align:center;color:#e8c547;">Pts</th></tr></thead><tbody>`;
   ranked.forEach(p => {
-    html += `<tr style="border-bottom:1px solid #333;">
-      <td style="padding:6px;text-align:center;">${p.rank}</td>
-      <td style="padding:6px;text-align:left;">${p.name}</td>
-      <td style="padding:6px;text-align:center;">${p.correct}</td>
-      <td style="padding:6px;text-align:center;">${p.wrong}</td>
-      <td style="padding:6px;text-align:center;">${p.pending}</td>
-      <td style="padding:6px;text-align:center;font-weight:bold;color:#e8c547;">${p.pts}</td>
-    </tr>`;
+    html += `<tr style="border-bottom:1px solid #333;"><td style="padding:6px;text-align:center;">${p.rank}</td><td style="padding:6px;text-align:left;">${p.name}</td><td style="padding:6px;text-align:center;">${p.correct}</td><td style="padding:6px;text-align:center;">${p.wrong}</td><td style="padding:6px;text-align:center;">${p.pending}</td><td style="padding:6px;text-align:center;font-weight:bold;color:#e8c547;">${p.pts}</td></tr>`;
   });
   html += `</tbody></table></div>`;
-  
   const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
   win.print();
 }
 
+// ============================================================
+// EVENTOS
+// ============================================================
 document.querySelectorAll("[data-view]").forEach(btn => {
   btn.addEventListener("click", function() {
     setView(this.dataset.view);
+  });
+});
+
+document.querySelectorAll("[data-jornada]").forEach(btn => {
+  btn.addEventListener("click", function() {
+    document.querySelectorAll("[data-jornada]").forEach(b => b.classList.remove("active"));
+    this.classList.add("active");
+    selectedJornada = this.dataset.jornada;
+    renderMatrix();
   });
 });
 
