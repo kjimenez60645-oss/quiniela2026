@@ -140,6 +140,24 @@
     .export-btn{background:rgba(201,162,39,0.2);border:1px solid rgba(201,162,39,0.4);color:#e8c547;border-radius:30px;padding:4px 12px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
     .btn-toggle-editor{background:rgba(201,162,39,0.15);border:1px solid rgba(201,162,39,0.3);color:#e8c547;border-radius:30px;padding:4px 12px;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
     @media(max-width:480px){.filter-row{flex-wrap:wrap}}
+    
+    .result-card{background:rgba(255,255,255,0.06);border-radius:16px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:1px solid rgba(255,255,255,0.08);transition:0.1s}
+    .result-card:active{background:rgba(255,255,255,0.12)}
+    .result-teams{font-size:14px;font-weight:600;flex:1}
+    .result-group{font-size:10px;color:rgba(255,255,255,0.4);margin-left:8px}
+    .result-badge-box{padding:4px 14px;border-radius:20px;font-weight:700;font-size:13px;min-width:40px;text-align:center}
+    .result-badge-L{background:#22c55e40;color:#86efac;border:1px solid #22c55e60}
+    .result-badge-E{background:#eab30840;color:#fde047;border:1px solid #eab30860}
+    .result-badge-V{background:#f9731640;color:#fdba74;border:1px solid #f9731660}
+    .result-badge-pending{background:rgba(255,255,255,0.08);color:#9ca3af;border:1px solid rgba(255,255,255,0.1)}
+    .result-jornada-title{font-size:12px;font-weight:700;color:#e8c547;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(201,162,39,0.2)}
+    .result-pick-item{display:flex;justify-content:space-between;padding:6px 8px;border-radius:8px;margin-bottom:4px;align-items:center}
+    .result-pick-item.correct{background:#22c55e20}
+    .result-pick-item.wrong{background:#ef444420}
+    .result-pick-item .name{font-weight:600;font-size:14px}
+    .result-pick-item .pick{font-weight:700;font-size:13px}
+    .result-pick-item .pick.correct{color:#4ade80}
+    .result-pick-item .pick.wrong{color:#f87171}
   </style>
 </head>
 <body>
@@ -172,12 +190,12 @@
 
   <div class="search-wrap">
     <i class="ti ti-search si"></i>
-    <input type="text" id="searchInput" placeholder="Buscar participante..." autocomplete="off">
+    <input type="text" id="searchInput" placeholder="Buscar participante o equipo..." autocomplete="off">
   </div>
 
   <div class="filter-row">
     <button class="filter-btn active" data-view="cards">🃏 Tarjetas</button>
-    <button class="filter-btn" data-view="table">🏆 Líderes</button>
+    <button class="filter-btn" data-view="results">📋 Resultados</button>
     <button class="filter-btn" data-view="matrix">📊 La Tabla</button>
   </div>
 
@@ -202,9 +220,23 @@
 
   <div class="section-title">⚽ Quiniela Mundialista 2026 – Fase de Grupos</div>
   <div id="cardsList" class="cards-section"></div>
-  <div id="tableView" class="cards-section" style="display:none;"></div>
+  <div id="resultsView" style="display:none;padding:8px 12px 0;"></div>
   <div id="matrixView" style="display:none;"></div>
   <div class="no-results" id="noResults" style="display:none;">No se encontró ese participante 🔍</div>
+</div>
+
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-sheet" id="resultModalSheet">
+    <div class="modal-handle-wrap">
+      <div class="modal-handle" id="resultModalHandle"></div>
+    </div>
+    <div class="modal-header">
+      <button class="modal-close" id="resultModalClose">✕</button>
+      <div class="modal-title" id="resultModalTitle"></div>
+      <div class="modal-sub" id="resultModalSub"></div>
+    </div>
+    <div class="modal-body" id="resultModalBody"></div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="predictionsModal">
@@ -230,7 +262,7 @@
 
 <script>
 // ============================================================
-// DATOS DE PARTIDOS
+// DATOS DE PARTIDOS CON RESULTADOS ACTUALIZADOS
 // ============================================================
 const JORNADAS = [
   { label: "Jornada 1 · 11–17 Jun", games: [
@@ -290,10 +322,9 @@ const JORNADAS = [
 ];
 
 // ============================================================
-// PREDICCIONES COMPLETAS (Todas las jornadas)
+// PREDICCIONES COMPLETAS
 // ============================================================
 const PREDICTIONS_DATA = {
-  // Jornada 1
   j1g01: { Cristina:"L", Consuelo:"E", Noe:"V", Jessica:"E", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"L", Miguelito:"L", Bryan:"L" },
   j1g02: { Cristina:"L", Consuelo:"E", Noe:"L", Jessica:"E", David:"V", Diana:"V", Julio:"E", Luis:"L", "Jose D":"E", Patron:"V", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"E", Miros:"L", Nacho:"E", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"L", "Miguel R":"E", Maria:"L", Miguelito:"E", Bryan:"L" },
   j1g03: { Cristina:"V", Consuelo:"L", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"E", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"V", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", Maria:"V", Miguelito:"L", Bryan:"L" },
@@ -318,7 +349,6 @@ const PREDICTIONS_DATA = {
   j1g22: { Cristina:"V", Consuelo:"L", Noe:"V", Jessica:"E", David:"L", Diana:"L", Julio:"V", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"E", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"E", Tony:"E", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"E", Maria:"E", Miguelito:"V", Bryan:"L" },
   j1g23: { Cristina:"V", Consuelo:"L", Noe:"V", Jessica:"L", David:"V", Diana:"E", Julio:"V", Luis:"L", "Jose D":"V", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"V", Papa:"L", KJ:"L", Yuny:"E", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", Maria:"L", Miguelito:"V", Bryan:"V" },
   j1g24: { Cristina:"V", Consuelo:"E", Noe:"E", Jessica:"L", David:"V", Diana:"V", Julio:"V", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"V", Papa:"V", KJ:"V", Yuny:"V", Miros:"L", Nacho:"V", Tony:"L", Speedy:"V", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", Maria:"L", Miguelito:"V", Bryan:"V" },
-  // Jornada 2
   j2g01: { Cristina:"V", Consuelo:"V", Noe:"V", Jessica:"E", David:"L", Diana:"V", Julio:"V", Luis:"V", "Jose D":"E", Patron:"L", "Julio Jr":"L", Andres:"E", Jorge:"E", Papa:"V", KJ:"L", Yuny:"L", Miros:"E", Nacho:"L", Tony:"L", Speedy:"E", "Carlos G":"V", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"L", Bryan:"V" },
   j2g02: { Cristina:"V", Consuelo:"E", Noe:"L", Jessica:"V", David:"L", Diana:"E", Julio:"L", Luis:"L", "Jose D":"L", Patron:"E", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"E", Tony:"E", Speedy:"E", "Carlos G":"L", "Miguel C":"L", "Miguel R":"V", "Miguelito":"V", Maria:"V", Bryan:"L" },
   j2g03: { Cristina:"V", Consuelo:"L", Noe:"L", Jessica:"E", David:"E", Diana:"V", Julio:"L", Luis:"L", "Jose D":"L", Patron:"V", "Julio Jr":"E", Andres:"E", Jorge:"E", Papa:"V", KJ:"E", Yuny:"L", Miros:"L", Nacho:"L", Tony:"V", Speedy:"L", "Carlos G":"L", "Miguel C":"V", "Miguel R":"L", "Miguelito":"L", Maria:"V", Bryan:"L" },
@@ -343,7 +373,6 @@ const PREDICTIONS_DATA = {
   j2g22: { Cristina:"V", Consuelo:"L", Noe:"L", Jessica:"V", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"E", Andres:"L", Jorge:"L", Papa:"V", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"E", Speedy:"L", "Carlos G":"V", "Miguel C":"L", "Miguel R":"L", "Miguelito":"V", Maria:"L", Bryan:"L" },
   j2g23: { Cristina:"V", Consuelo:"E", Noe:"V", Jessica:"L", David:"V", Diana:"L", Julio:"E", Luis:"V", "Jose D":"V", Patron:"L", "Julio Jr":"V", Andres:"V", Jorge:"L", Papa:"L", KJ:"V", Yuny:"L", Miros:"V", Nacho:"V", Tony:"V", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"V", "Miguelito":"L", Maria:"V", Bryan:"V" },
   j2g24: { Cristina:"L", Consuelo:"L", Noe:"E", Jessica:"L", David:"L", Diana:"L", Julio:"L", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"L", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
-  // Jornada 3
   j3g01: { Cristina:"V", Consuelo:"E", Noe:"L", Jessica:"L", David:"L", Diana:"E", Julio:"V", Luis:"L", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"V", Papa:"L", KJ:"L", Yuny:"E", Miros:"E", Nacho:"E", Tony:"L", Speedy:"V", "Carlos G":"L", "Miguel C":"V", "Miguel R":"V", "Miguelito":"V", Maria:"L", Bryan:"L" },
   j3g02: { Cristina:"V", Consuelo:"V", Noe:"L", Jessica:"L", David:"L", Diana:"L", Julio:"E", Luis:"L", "Jose D":"E", Patron:"E", "Julio Jr":"L", Andres:"E", Jorge:"V", Papa:"V", KJ:"L", Yuny:"L", Miros:"V", Nacho:"E", Tony:"L", Speedy:"E", "Carlos G":"L", "Miguel C":"V", "Miguel R":"E", "Miguelito":"E", Maria:"V", Bryan:"L" },
   j3g03: { Cristina:"L", Consuelo:"L", Noe:"L", Jessica:"L", David:"L", Diana:"V", Julio:"V", Luis:"V", "Jose D":"L", Patron:"L", "Julio Jr":"L", Andres:"L", Jorge:"L", Papa:"L", KJ:"L", Yuny:"V", Miros:"L", Nacho:"L", Tony:"L", Speedy:"L", "Carlos G":"L", "Miguel C":"L", "Miguel R":"L", "Miguelito":"L", Maria:"L", Bryan:"L" },
@@ -376,9 +405,6 @@ const PARTICIPANT_COLORS = { Cristina:"#ec4899", Consuelo:"#f97316", Noe:"#3b82f
 let currentView = "cards";
 let searchVal = "";
 let selectedJornada = "all";
-let isDragging = false;
-let startY = 0;
-let currentY = 0;
 
 function getGames() {
   return JORNADAS.flatMap((j, idx) => j.games.map(g => ({ ...g, jornada: j.label, jornadaIdx: idx })));
@@ -462,29 +488,70 @@ function renderCards() {
     </div>`).join("");
 }
 
-function renderTable() {
-  const ranked = computeRankings();
-  let list = [...ranked];
-  if (searchVal) list = list.filter(p => p.name.toLowerCase().includes(searchVal.toLowerCase()));
-  const container = document.getElementById("tableView");
+function renderResults() {
+  const container = document.getElementById("resultsView");
   const noRes = document.getElementById("noResults");
-  if(!list.length){ container.innerHTML=""; noRes.style.display="block"; return; }
+  
+  let filteredGames = getGames();
+  if (searchVal) {
+    filteredGames = filteredGames.filter(g => 
+      g.home.toLowerCase().includes(searchVal) || 
+      g.away.toLowerCase().includes(searchVal)
+    );
+  }
+  if (selectedJornada !== "all") {
+    filteredGames = filteredGames.filter(g => g.jornadaIdx === parseInt(selectedJornada));
+  }
+  
+  if(!filteredGames.length){ container.innerHTML=""; noRes.style.display="block"; return; }
   noRes.style.display="none";
-  let html = `<table class="standings-table"><thead><tr><th>#</th><th>Participante</th><th>✅</th><th>❌</th><th>⏳</th><th>Pts</th></tr></thead><tbody>`;
-  list.forEach(p => {
-    let rowClass = "";
-    if(p.rank===1) rowClass="table-rank-1";
-    else if(p.rank===2) rowClass="table-rank-2";
-    else if(p.rank===3) rowClass="table-rank-3";
-    html += `<tr class="${rowClass}" onclick="openModal('${p.name}')">
-      <td>${p.rank}</td>
-      <td style="text-align:left">${p.name}</td>
-      <td>${p.correct}</td><td>${p.wrong}</td><td>${p.pending}</td>
-      <td class="table-pts">${p.pts}</td>
-    </tr>`;
+  
+  let html = "";
+  let currentJornada = "";
+  filteredGames.forEach(g => {
+    if (g.jornada !== currentJornada) {
+      currentJornada = g.jornada;
+      html += `<div class="result-jornada-title">${g.jornada}</div>`;
+    }
+    let badgeClass = "result-badge-pending";
+    let badgeText = "⏳ Pendiente";
+    if (g.result === "L") { badgeClass = "result-badge-L"; badgeText = "🏠 Local"; }
+    else if (g.result === "E") { badgeClass = "result-badge-E"; badgeText = "🤝 Empate"; }
+    else if (g.result === "V") { badgeClass = "result-badge-V"; badgeText = "✈️ Visita"; }
+    html += `
+      <div class="result-card" onclick="openResultModal('${g.id}')">
+        <div class="result-teams">${g.home} <span style="color:rgba(255,255,255,0.3);margin:0 4px;">vs</span> ${g.away}<span class="result-group">Grupo ${g.group}</span></div>
+        <div class="result-badge-box ${badgeClass}">${badgeText}</div>
+      </div>
+    `;
   });
-  html += `</tbody></table>`;
   container.innerHTML = html;
+}
+
+function openResultModal(matchId) {
+  const games = getGames();
+  const match = games.find(g => g.id === matchId);
+  if (!match) return;
+  document.getElementById("resultModalTitle").innerHTML = `${match.home} vs ${match.away}`;
+  document.getElementById("resultModalSub").innerHTML = `Grupo ${match.group} · ${match.jornada}`;
+  let html = `<div style="text-align:center;margin-bottom:16px;padding:12px;background:rgba(0,0,0,0.2);border-radius:12px;"><div style="font-size:18px;font-weight:700;">Resultado: ${labelFor(match.result)}</div></div>`;
+  const participants = getParticipants();
+  const picks = participants.map(p => {
+    const pick = p.predictions[matchId];
+    const isCorrect = pick && match.result && pick === match.result;
+    return { name: p.name, pick, isCorrect, color: p.color };
+  }).filter(p => p.pick);
+  picks.sort((a,b) => (b.isCorrect ? 1 : 0) - (a.isCorrect ? 1 : 0));
+  html += `<div style="margin-top:8px;"><div style="font-size:13px;font-weight:700;color:#e8c547;margin-bottom:8px;">📊 Predicciones (${picks.length} participantes)</div>`;
+  picks.forEach(p => {
+    const statusClass = p.isCorrect ? "correct" : "wrong";
+    const statusText = p.isCorrect ? "✅ Acierto" : "❌ Fallo";
+    const pickText = p.pick === "L" ? "🏠 Local" : p.pick === "E" ? "🤝 Empate" : "✈️ Visita";
+    html += `<div class="result-pick-item ${statusClass}"><div class="name" style="color:${p.color}">${p.name}</div><div><span class="pick ${statusClass}">${pickText}</span><span style="font-size:11px;margin-left:8px;color:rgba(255,255,255,0.5);">${statusText}</span></div></div>`;
+  });
+  html += `</div>`;
+  document.getElementById("resultModalBody").innerHTML = html;
+  document.getElementById("resultModal").classList.add("open");
 }
 
 function renderMatrix() {
@@ -495,24 +562,12 @@ function renderMatrix() {
   const noRes = document.getElementById("noResults");
   if(!filtered.length){ container.innerHTML=""; noRes.style.display="block"; return; }
   noRes.style.display="none";
-  
   let games = getGames();
   if (selectedJornada !== "all") {
     games = games.filter(g => g.jornadaIdx === parseInt(selectedJornada));
   }
-  
-  let html = `<div class="legend">
-    <span><div class="box" style="background:#22c55e60;"></div> 🟢 Local (L)</span>
-    <span><div class="box" style="background:#eab30860;"></div> 🟡 Empate (E)</span>
-    <span><div class="box" style="background:#f9731660;"></div> 🟠 Visita (V)</span>
-    <span><div class="box" style="background:rgba(255,255,255,0.2);"></div> ⚪ Sin predicción</span>
-  </div>
-  <div class="matrix-wrapper">
-    <div class="scroll-hint">← desliza para ver más →</div>
-    <table class="matrix-table"><thead><tr><th class="sticky-col">Participante</th>`;
-  games.forEach(m => {
-    html += `<th title="${m.home} vs ${m.away} (Grupo ${m.group})">${m.home} vs ${m.away}</th>`;
-  });
+  let html = `<div class="legend"><span><div class="box" style="background:#22c55e60;"></div> 🟢 Local (L)</span><span><div class="box" style="background:#eab30860;"></div> 🟡 Empate (E)</span><span><div class="box" style="background:#f9731660;"></div> 🟠 Visita (V)</span><span><div class="box" style="background:rgba(255,255,255,0.2);"></div> ⚪ Sin predicción</span></div><div class="matrix-wrapper"><div class="scroll-hint">← desliza para ver más →</div><table class="matrix-table"><thead><tr><th class="sticky-col">Participante</th>`;
+  games.forEach(m => { html += `<th title="${m.home} vs ${m.away} (Grupo ${m.group})">${m.home} vs ${m.away}</th>`; });
   html += `</tr></thead><tbody>`;
   filtered.forEach(p => {
     html += `<tr class="participant-row" onclick="openModal('${p.name}')"><td class="sticky-col">${p.name}</td>`;
@@ -533,7 +588,7 @@ function renderMatrix() {
 function renderAll() {
   renderPodium();
   if(currentView === "cards") renderCards();
-  else if(currentView === "table") renderTable();
+  else if(currentView === "results") renderResults();
   else if(currentView === "matrix") renderMatrix();
 }
 
@@ -541,40 +596,30 @@ function setView(view) {
   currentView = view;
   document.querySelectorAll("[data-view]").forEach(b => b.classList.remove("active"));
   document.querySelector(`[data-view="${view}"]`)?.classList.add("active");
-  
   const jornadaFilters = document.getElementById("jornadaFilters");
-  if (view === "matrix") {
+  if (view === "matrix" || view === "results") {
     jornadaFilters.style.display = "flex";
   } else {
     jornadaFilters.style.display = "none";
   }
-  
   const cardsDiv = document.getElementById("cardsList");
-  const tableDiv = document.getElementById("tableView");
+  const resultsDiv = document.getElementById("resultsView");
   const matrixDiv = document.getElementById("matrixView");
   cardsDiv.style.display = view==="cards" ? "block" : "none";
-  tableDiv.style.display = view==="table" ? "block" : "none";
+  resultsDiv.style.display = view==="results" ? "block" : "none";
   matrixDiv.style.display = view==="matrix" ? "block" : "none";
   renderAll();
 }
 
-// ============================================================
-// MODAL CON SWIPE PARA CERRAR Y PREVENCIÓN DE REFRESCO
-// ============================================================
 function openModal(name) {
   const ranked = computeRankings();
   const p = ranked.find(x => x.name === name);
   if(!p) return;
-  
   const av = document.getElementById("modalAvatar");
   av.style.background = p.color+"33"; av.style.color=p.color; av.textContent=initials(p.name);
   document.getElementById("modalName").innerHTML = `${p.rank}. ${p.name}`;
   document.getElementById("modalSub").innerHTML = `Posición ${p.rank} de ${ranked.length} · ${p.correct} aciertos`;
-  document.getElementById("modalStats").innerHTML = `
-    <div class="stat-box"><div class="stat-num" style="color:#4ade80">${p.correct}</div><div class="stat-lbl">Aciertos</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:#f87171">${p.wrong}</div><div class="stat-lbl">Fallos</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:#facc15">${p.pts}</div><div class="stat-lbl">Puntos</div></div>`;
-  
+  document.getElementById("modalStats").innerHTML = `<div class="stat-box"><div class="stat-num" style="color:#4ade80">${p.correct}</div><div class="stat-lbl">Aciertos</div></div><div class="stat-box"><div class="stat-num" style="color:#f87171">${p.wrong}</div><div class="stat-lbl">Fallos</div></div><div class="stat-box"><div class="stat-num" style="color:#facc15">${p.pts}</div><div class="stat-lbl">Puntos</div></div>`;
   let html = "";
   JORNADAS.forEach((j, idx) => {
     const isCurrent = idx === 1;
@@ -585,15 +630,10 @@ function openModal(name) {
       if(g.result && pick){ pickClass=pick===g.result?"pick-correct":"pick-wrong"; resBadge=pick===g.result?`<span class="result-badge res-correct">✅ Acierto</span>`:`<span class="result-badge res-wrong">❌ Fallo</span>`; }
       else if(!g.result) resBadge=`<span class="result-badge res-pending">⏳ Pendiente</span>`;
       else if(!pick) resBadge=`<span class="result-badge res-pending">❓ Sin predicción</span>`;
-      html += `<div class="game-row"><div class="game-teams">${g.home} vs ${g.away} <span class="group-badge">Grupo ${g.group}</span></div>
-        <div class="game-picks">
-          <div><div class="pick-label">Tu predicción</div><div class="pick-val ${pickClass}">${labelFor(pick)}</div></div>
-          <div><div class="pick-label">Resultado real</div><div class="pick-val ${g.result?(pick===g.result?"pick-correct":"pick-wrong"):"pick-pending"}">${labelFor(g.result)}</div></div>
-        </div>${resBadge}</div>`;
+      html += `<div class="game-row"><div class="game-teams">${g.home} vs ${g.away} <span class="group-badge">Grupo ${g.group}</span></div><div class="game-picks"><div><div class="pick-label">Tu predicción</div><div class="pick-val ${pickClass}">${labelFor(pick)}</div></div><div><div class="pick-label">Resultado real</div><div class="pick-val ${g.result?(pick===g.result?"pick-correct":"pick-wrong"):"pick-pending"}">${labelFor(g.result)}</div></div></div>${resBadge}</div>`;
     });
   });
   document.getElementById("modalGames").innerHTML = html;
-  
   const modal = document.getElementById("predictionsModal");
   const sheet = document.getElementById("modalSheet");
   modal.classList.add("open");
@@ -606,87 +646,72 @@ function closeModal() {
   const modal = document.getElementById("predictionsModal");
   const sheet = document.getElementById("modalSheet");
   sheet.classList.add("closing");
-  setTimeout(() => {
-    modal.classList.remove("open");
-    sheet.classList.remove("closing");
-    sheet.style.transform = "";
-  }, 300);
+  setTimeout(() => { modal.classList.remove("open"); sheet.classList.remove("closing"); sheet.style.transform = ""; }, 300);
 }
 
-// Swipe to close
-const modalSheet = document.getElementById("modalSheet");
-const modalHandle = document.getElementById("modalHandle");
-
-modalHandle.addEventListener("touchstart", startSwipe, { passive: true });
-modalSheet.addEventListener("touchstart", function(e) {
-  if (modalSheet.scrollTop === 0) {
-    startSwipe(e);
-  }
-}, { passive: true });
-
-function startSwipe(e) {
-  const touch = e.touches[0];
-  startY = touch.clientY;
-  isDragging = true;
-  modalSheet.classList.add("dragging");
+function closeResultModal() {
+  const modal = document.getElementById("resultModal");
+  const sheet = document.getElementById("resultModalSheet");
+  sheet.classList.add("closing");
+  setTimeout(() => { modal.classList.remove("open"); sheet.classList.remove("closing"); sheet.style.transform = ""; }, 300);
 }
 
-document.addEventListener("touchmove", function(e) {
-  if (!isDragging) return;
-  const touch = e.touches[0];
-  currentY = touch.clientY;
-  const diff = currentY - startY;
-  if (diff > 0) {
-    modalSheet.style.transform = `translateY(${diff}px)`;
-  }
-}, { passive: true });
-
-document.addEventListener("touchend", function(e) {
-  if (!isDragging) return;
-  isDragging = false;
-  modalSheet.classList.remove("dragging");
-  const diff = currentY - startY;
-  if (diff > 100) {
-    closeModal();
-  } else {
-    modalSheet.style.transform = "translateY(0)";
-  }
-  startY = 0;
-  currentY = 0;
-}, { passive: true });
-
-// Mouse drag
-modalHandle.addEventListener("mousedown", function(e) {
-  startY = e.clientY;
-  isDragging = true;
-  modalSheet.classList.add("dragging");
-  
-  function onMouseMove(e) {
-    if (!isDragging) return;
-    const diff = e.clientY - startY;
-    if (diff > 0) {
-      modalSheet.style.transform = `translateY(${diff}px)`;
+function setupSwipe(modalId, sheetId, handleId, closeFn) {
+  const sheet = document.getElementById(sheetId);
+  const handle = document.getElementById(handleId);
+  let isDraggingLocal = false, startYLocal = 0, currentYLocal = 0;
+  handle.addEventListener("touchstart", function(e) {
+    const touch = e.touches[0];
+    startYLocal = touch.clientY;
+    isDraggingLocal = true;
+    sheet.classList.add("dragging");
+  }, { passive: true });
+  sheet.addEventListener("touchstart", function(e) {
+    if (sheet.scrollTop === 0) {
+      const touch = e.touches[0];
+      startYLocal = touch.clientY;
+      isDraggingLocal = true;
+      sheet.classList.add("dragging");
     }
-  }
-  
-  function onMouseUp(e) {
-    if (!isDragging) return;
-    isDragging = false;
-    modalSheet.classList.remove("dragging");
-    const diff = e.clientY - startY;
-    if (diff > 100) {
-      closeModal();
-    } else {
-      modalSheet.style.transform = "translateY(0)";
+  }, { passive: true });
+  document.addEventListener("touchmove", function(e) {
+    if (!isDraggingLocal) return;
+    const touch = e.touches[0];
+    currentYLocal = touch.clientY;
+    const diff = currentYLocal - startYLocal;
+    if (diff > 0) { sheet.style.transform = `translateY(${diff}px)`; }
+  }, { passive: true });
+  document.addEventListener("touchend", function(e) {
+    if (!isDraggingLocal) return;
+    isDraggingLocal = false;
+    sheet.classList.remove("dragging");
+    const diff = currentYLocal - startYLocal;
+    if (diff > 100) { closeFn(); } else { sheet.style.transform = "translateY(0)"; }
+    startYLocal = 0; currentYLocal = 0;
+  }, { passive: true });
+  handle.addEventListener("mousedown", function(e) {
+    startYLocal = e.clientY;
+    isDraggingLocal = true;
+    sheet.classList.add("dragging");
+    function onMouseMove(e) {
+      if (!isDraggingLocal) return;
+      const diff = e.clientY - startYLocal;
+      if (diff > 0) { sheet.style.transform = `translateY(${diff}px)`; }
     }
-    startY = 0;
-    document.removeEventListener("mousemove", onMouseMove);
-    document.removeEventListener("mouseup", onMouseUp);
-  }
-  
-  document.addEventListener("mousemove", onMouseMove);
-  document.addEventListener("mouseup", onMouseUp);
-});
+    function onMouseUp(e) {
+      if (!isDraggingLocal) return;
+      isDraggingLocal = false;
+      sheet.classList.remove("dragging");
+      const diff = e.clientY - startYLocal;
+      if (diff > 100) { closeFn(); } else { sheet.style.transform = "translateY(0)"; }
+      startYLocal = 0;
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    }
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  });
+}
 
 function populateEditor() {
   const select = document.getElementById("matchSelect");
@@ -718,56 +743,20 @@ function exportPDF() {
   const ranked = computeRankings();
   const games = getGames();
   const played = games.filter(g => g.result !== null).length;
-  
-  // Create a clean PDF with white text on dark background
-  let html = `
-    <div style="font-family:Arial,sans-serif;padding:30px;background:#0a1628;color:#ffffff;max-width:100%;">
-      <h1 style="color:#e8c547;text-align:center;font-size:24px;margin-bottom:4px;">⚽ Quiniela Mundial 2026</h1>
-      <p style="text-align:center;color:#cccccc;font-size:14px;margin-bottom:20px;">Fase de Grupos · ${played}/${games.length} partidos jugados</p>
-      <hr style="border-color:#333;margin:16px 0;">
-      <h2 style="color:#e8c547;font-size:18px;margin:12px 0;">🏆 Clasificación</h2>
-      <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;color:#ffffff;">
-        <thead>
-          <tr style="background:#1a3a5c;">
-            <th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">#</th>
-            <th style="padding:10px 8px;text-align:left;color:#e8c547;font-weight:700;border:1px solid #333;">Participante</th>
-            <th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">✅</th>
-            <th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">❌</th>
-            <th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">⏳</th>
-            <th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">Pts</th>
-          </tr>
-        </thead>
-        <tbody>`;
-  
+  let html = `<div style="font-family:Arial,sans-serif;padding:30px;background:#0a1628;color:#ffffff;max-width:100%;"><h1 style="color:#e8c547;text-align:center;font-size:24px;margin-bottom:4px;">⚽ Quiniela Mundial 2026</h1><p style="text-align:center;color:#cccccc;font-size:14px;margin-bottom:20px;">Fase de Grupos · ${played}/${games.length} partidos jugados</p><hr style="border-color:#333;margin:16px 0;"><h2 style="color:#e8c547;font-size:18px;margin:12px 0;">🏆 Clasificación</h2><table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;color:#ffffff;"><thead><tr style="background:#1a3a5c;"><th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">#</th><th style="padding:10px 8px;text-align:left;color:#e8c547;font-weight:700;border:1px solid #333;">Participante</th><th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">✅</th><th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">❌</th><th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">⏳</th><th style="padding:10px 8px;text-align:center;color:#e8c547;font-weight:700;border:1px solid #333;">Pts</th></tr></thead><tbody>`;
   ranked.forEach((p, index) => {
     const bgColor = index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.05)';
-    html += `<tr style="background:${bgColor};border-bottom:1px solid #333;">
-      <td style="padding:8px;text-align:center;color:#ffffff;border:1px solid #333;">${p.rank}</td>
-      <td style="padding:8px;text-align:left;color:#ffffff;border:1px solid #333;">${p.name}</td>
-      <td style="padding:8px;text-align:center;color:#4ade80;border:1px solid #333;">${p.correct}</td>
-      <td style="padding:8px;text-align:center;color:#f87171;border:1px solid #333;">${p.wrong}</td>
-      <td style="padding:8px;text-align:center;color:#facc15;border:1px solid #333;">${p.pending}</td>
-      <td style="padding:8px;text-align:center;color:#e8c547;font-weight:bold;border:1px solid #333;">${p.pts}</td>
-    </tr>`;
+    html += `<tr style="background:${bgColor};border-bottom:1px solid #333;"><td style="padding:8px;text-align:center;color:#ffffff;border:1px solid #333;">${p.rank}</td><td style="padding:8px;text-align:left;color:#ffffff;border:1px solid #333;">${p.name}</td><td style="padding:8px;text-align:center;color:#4ade80;border:1px solid #333;">${p.correct}</td><td style="padding:8px;text-align:center;color:#f87171;border:1px solid #333;">${p.wrong}</td><td style="padding:8px;text-align:center;color:#facc15;border:1px solid #333;">${p.pending}</td><td style="padding:8px;text-align:center;color:#e8c547;font-weight:bold;border:1px solid #333;">${p.pts}</td></tr>`;
   });
-  
-  html += `</tbody></table>
-      <p style="text-align:center;color:#888;font-size:11px;margin-top:20px;">Generado el ${new Date().toLocaleDateString('es-ES')}</p>
-    </div>`;
-  
+  html += `</tbody></table><p style="text-align:center;color:#888;font-size:11px;margin-top:20px;">Generado el ${new Date().toLocaleDateString('es-ES')}</p></div>`;
   const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
   win.print();
 }
 
-// ============================================================
-// EVENTOS
-// ============================================================
 document.querySelectorAll("[data-view]").forEach(btn => {
-  btn.addEventListener("click", function() {
-    setView(this.dataset.view);
-  });
+  btn.addEventListener("click", function() { setView(this.dataset.view); });
 });
 
 document.querySelectorAll("[data-jornada]").forEach(btn => {
@@ -775,7 +764,7 @@ document.querySelectorAll("[data-jornada]").forEach(btn => {
     document.querySelectorAll("[data-jornada]").forEach(b => b.classList.remove("active"));
     this.classList.add("active");
     selectedJornada = this.dataset.jornada;
-    renderMatrix();
+    renderAll();
   });
 });
 
@@ -797,12 +786,7 @@ document.getElementById("fullPodiumBtn").addEventListener("click", function() {
   const played = games.filter(g => g.result !== null).length;
   document.getElementById("fullPodiumSub").innerHTML = `${ranked.length} participantes · ${played}/${games.length} partidos jugados`;
   document.getElementById("fullPodiumList").innerHTML = ranked.map(p => {
-    return `<div class="podium-row ${rankBgClass(p.rank)}" onclick="closeFull();openModal('${p.name}')">
-      <span class="podium-rank" style="font-size:${p.rank>3?'16px':'22px'}">${p.rank === 1 ? '🥇' : p.rank === 2 ? '🥈' : p.rank === 3 ? '🥉' : p.rank}</span>
-      <div class="podium-avatar" style="background:${p.color}22;color:${p.color};width:38px;height:38px;font-size:13px">${initials(p.name)}</div>
-      <div class="podium-info"><div class="podium-name" style="font-size:14px">${p.name}</div><div class="podium-pts">✅${p.correct} ❌${p.wrong} ⏳${p.pending}</div></div>
-      <span style="font-size:16px;font-weight:700;color:#e8c547">${p.pts} pts</span>
-    </div>`;
+    return `<div class="podium-row ${rankBgClass(p.rank)}" onclick="closeFull();openModal('${p.name}')"><span class="podium-rank" style="font-size:${p.rank>3?'16px':'22px'}">${p.rank === 1 ? '🥇' : p.rank === 2 ? '🥈' : p.rank === 3 ? '🥉' : p.rank}</span><div class="podium-avatar" style="background:${p.color}22;color:${p.color};width:38px;height:38px;font-size:13px">${initials(p.name)}</div><div class="podium-info"><div class="podium-name" style="font-size:14px">${p.name}</div><div class="podium-pts">✅${p.correct} ❌${p.wrong} ⏳${p.pending}</div></div><span style="font-size:16px;font-weight:700;color:#e8c547">${p.pts} pts</span></div>`;
   }).join("");
   document.getElementById("fullPodiumModal").classList.add("open");
 });
@@ -831,6 +815,14 @@ document.getElementById("modalCloseBottom").addEventListener("click", closeModal
 document.getElementById("predictionsModal").addEventListener("click", function(e) {
   if(e.target === this) closeModal();
 });
+
+document.getElementById("resultModalClose").addEventListener("click", closeResultModal);
+document.getElementById("resultModal").addEventListener("click", function(e) {
+  if(e.target === this) closeResultModal();
+});
+
+setupSwipe("predictionsModal", "modalSheet", "modalHandle", closeModal);
+setupSwipe("resultModal", "resultModalSheet", "resultModalHandle", closeResultModal);
 
 function closeFull() {
   document.getElementById("fullPodiumModal").classList.remove("open");
